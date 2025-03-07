@@ -1,44 +1,33 @@
 import { Elysia, t } from "elysia";
 
-import { Cat } from "./types";
+import { ICat } from "./types";
 
 const apiKey = process.env.API_KEY;
-const catUrl = "https://api.thecatapi.com/v1/images";
+const catUrl = "https://api.thecatapi.com/v1/images/search";
 const authenticatedCatUrl = "https://api.thecatapi.com/v1/images?api_key=" + apiKey;
 const testUrl = "https://api.thecatapi.com/v1/images/search?limit=10";
 
-const getCats = async () => {
+const getCats = async (breed: string, amount: number = 6) => {
   console.log(`Fetching cat images 🐈 🐈 🐈`);
   // I don't think we need authentication, because we don't need more than 10 images at a time from thecatapi.com
   // const response = apiKey ? await fetch(authenticatedCatUrl) : await fetch(catUrl);
-  const response = await fetch(testUrl);
+  const response = await fetch(catUrl + "?limit=" + amount + "&breed_ids=" + breed);
   const cats = await response.json();
 
   if (response.ok) {
-    // const leftColumn: Cat[] = [];
-    // const rightColumn: Cat[] = [];
-
-    // cats.forEach((cat: Cat, i: number) => {
-    //   if (i % 2 === 0) {
-    //     leftColumn.push(cat);
-    //   } else {
-    //     rightColumn.push(cat);
-    //   }
-    // });
+    console.log(cats)
 
     return cats;
   }
 };
 
 class Collage {
-  // TODO: start with empry list of cats
-    constructor(public data: Cat[] = [
-      {id: "12k", url: "https://cdn2.thecatapi.com/images/12k.jpg", width: 250, height: 250}
-    ]) {}
+    constructor(public data: ICat[] = []) {}
 
-    async add(cat: Cat) {
-      const cats = await getCats();
-      this.data.push(cat) 
+    async add(breed: string, amount?: number) {
+      const cats = await getCats(breed, amount);
+
+      this.data.push(cats) 
 
       return this.data 
     } 
@@ -47,7 +36,7 @@ class Collage {
       return this.data.splice(index, 1) 
     } 
 
-    update(index: number, cat: Cat) {
+    update(index: number, cat: ICat) {
       return (this.data[index] = cat) 
     } 
 }
@@ -69,8 +58,39 @@ export const catCollage = new Elysia()
       }) 
     }
    )
-  .put('/note', ({ collage, body: { data } }) => collage.add(data), { 
+  .post('/collage', ({ collage, body: { breed, amount } }) => collage.add(breed, amount), { 
     body: t.Object({ 
-      data: t.String() 
+      breed: t.String(),
+      // I would like to make amount non-required, but couldn't find the answer that quickly in the schema validation section of the Elysia docs
+      amount: t.Number()
     }) 
-  }) 
+  })
+  .delete( 
+    '/collage/:index', 
+    ({ collage, params: { index }, error }) => { 
+      if (index in collage.data) return collage.remove(index) 
+
+      return error(422) 
+    }, 
+    { 
+      params: t.Object({ 
+        index: t.Number() 
+      }) 
+    } 
+  )
+  .patch( 
+    '/collage/:index', 
+    ({ collage, params: { index }, body: { data }, error }) => { 
+      if (index in collage.data) return collage.update(index, data) 
+
+      return error(422) 
+    }, 
+    { 
+      params: t.Object({ 
+        index: t.Number() 
+      }), 
+      body: t.Object({ 
+        data: t.String() 
+      }) 
+    } 
+  ) 

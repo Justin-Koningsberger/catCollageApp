@@ -10,11 +10,11 @@ interface IPhoto {
   url: string;
 }
 
-interface Cat {
+interface ICat {
   id: string;
   url: string;
   width: number;
   height: number;
 }
 
-export { ICollage, IPhoto, Cat };
+export { ICollage, IPhoto, ICat };
