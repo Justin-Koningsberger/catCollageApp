@@ -3,8 +3,6 @@ import { swagger } from '@elysiajs/swagger'
 
 import { catCollage } from "./collage"
 
-// import { ICollage, IPhoto, ICat } from "./types"
-
 const app = new Elysia()
 // @ts-ignore; For some reason get typescript was giving an error on the next line (Property 'use' does not exist on type 'Elysia'.), normally I would put more effort into fixing it, but I don't want to waste too much time right now
   .use(swagger())

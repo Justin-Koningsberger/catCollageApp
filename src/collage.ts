@@ -15,7 +15,7 @@ const getCats = async (breed: string, amount: number = 6) => {
   const cats = await response.json();
 
   if (response.ok) {
-    console.log(cats)
+    console.log(cats);
 
     return cats;
   }
@@ -24,28 +24,27 @@ const getCats = async (breed: string, amount: number = 6) => {
 class Collage {
     constructor(public data: ICat[] = []) {}
 
+    // TODO: find a way of making the id unique, and prevent adding cats to a collage twice
     async add(breed: string, amount?: number) {
       const cats = await getCats(breed, amount);
 
-      this.data.push(cats) 
+      cat => this.data.push(cats);
 
-      return this.data 
+      return this.data;
     } 
 
     remove(index: number) {
-      return this.data.splice(index, 1) 
+      return this.data.splice(index, 1);
     } 
 
     update(index: number, cat: ICat) {
-      return (this.data[index] = cat) 
+      return (this.data[index] = cat);
     } 
 }
 
 export const catCollage = new Elysia()
 // @ts-ignore; For some reason get typescript was giving an error on the next line (Property 'decorate' does not exist on type 'Elysia'.), normally I would put more effort into fixing it, but I don't want to waste too much time right now
   .decorate('collage', new Collage())
-  // .get("/collage", () => getCatCollage())
-  // .post('/collage', (breed: string, amount: number) => postCatCollage(breed, amount))
   .get('/collage', ({ collage }) => collage.data)
   .get(
     '/collage/:index', 
@@ -61,8 +60,7 @@ export const catCollage = new Elysia()
   .post('/collage', ({ collage, body: { breed, amount } }) => collage.add(breed, amount), { 
     body: t.Object({ 
       breed: t.String(),
-      // I would like to make amount non-required, but couldn't find the answer that quickly in the schema validation section of the Elysia docs
-      amount: t.Number()
+      amount: t.Optional(t.Number())
     }) 
   })
   .delete( 
@@ -90,7 +88,12 @@ export const catCollage = new Elysia()
         index: t.Number() 
       }), 
       body: t.Object({ 
-        data: t.String() 
+        data: t.Object({
+          id: t.String(),
+          url: t.String(),
+          width: t.Number(),
+          height: t.Number()
+        })
       }) 
     } 
   ) 

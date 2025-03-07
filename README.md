@@ -1,7 +1,7 @@
 # CatCollageApp
 
 ## Getting Started
-To get started with this app, simply paste this command into your terminal:
+To get started with this app, first install all the neccesary packages with ```yarn install``` or ```npm install``` and then start the backend server with:
 ```yarn start``` or ```npm start```
 
 ## Development
