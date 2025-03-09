@@ -2,7 +2,7 @@ import { Elysia, t } from "elysia";
 
 import { ICat } from "./types";
 
-const apiKey = null;
+const apiKey = process.env.API_KEY;
 const authenticatedCatUrl = "https://api.thecatapi.com/v1/images/search?api_key=" + apiKey;
 const breedUrl = "https://api.thecatapi.com/v1/breeds";
 const catUrl = "https://api.thecatapi.com/v1/images/search";
@@ -101,7 +101,7 @@ export const catCollage = new Elysia({ prefix: '/collage' })
     })
 
     if (errorText.length > 0) {
-      // Return an error explaining which breed/s does not exist in the cat API
+      // Return an error explaining which breed/s do not exist in the cat API
       console.log(errorText + "\n")
 
       return error(422, errorText)
